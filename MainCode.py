@@ -4,77 +4,71 @@ import datetime
 filename = 'clients.csv'
 
 
-def ViewClients():
+def viewclients():
     with open(filename, mode='r') as file:
         reader = csv.reader(file)
         for lines in reader:
             print(lines)
 
 
-def addClient(title, last_name, first_name, pronouns, email, date_of_birth, occupation, balance, overdraft):
-    if not checkClient(date_of_birth, balance, overdraft):
-        print("Client input declined")
+def addclients(title, last_name, first_name, pronouns, email, date_of_birth, occupation, balance, overdraft):
+    if not checkclient(date_of_birth, balance, overdraft):
+        print("Client input not approved")
         return
 
-    clientID = 0
+    clientid = 0
     with open(filename, 'r') as file:
         reader = csv.reader(file)
         next(reader)
         for line in enumerate(reader):
-            clientID = int(line[0]) + 1
+            clientid = int(line[0]) + 1
 
     with open(filename, 'a', newline='') as file:
         writer = csv.writer(file, delimiter=',')
         writer.writerow(
-            [clientID, title, last_name, first_name, pronouns, email, date_of_birth, occupation, balance, overdraft])
+            [clientid, title, last_name, first_name, pronouns, email, date_of_birth, occupation, balance, overdraft])
 
 
-def checkClient(date_of_birth, balance, overdraft):
-    try:
-        isinstance(float(balance), float)
-    except:
-        print("Balance is not decimal")
-        return False
+def checkclient(date_of_birth, balance, overdraft):
     try:
         isinstance(float(overdraft), float)
     except:
-        print("Overdraft is not decimal")
+        print("Overdraft input is not valid")
         return False
 
-    if not checkDOB(date_of_birth):
+    if not checkdob(date_of_birth):
+        return False
+
+    try:
+        isinstance(float(balance), float)
+    except:
+        print("Balance input is not valid")
         return False
 
     return True
 
 
-def appendCSV(string):
-    with open(filename, 'a', newline='') as file:
-        writer = csv.writer(file, delimiter=',')
-        writer.writerows([string])
-
-
-def catagoriesCSV():
-    fields = (
-    'ClientID', 'title', 'last_name', 'first_name', 'pronouns', 'email', 'date_of_birth', 'occupation', 'balance',
-    'overdraft')
+def catagoriescsv():
+    fields =('ClientID ', 'title ', 'last_name ', 'first_name ', 'pronouns ', 'email ', 'date_of_birth ', 'occupation ', 'balance ',
+              'overdraft ')
     with open(filename, 'w', newline='') as file:
         writer = csv.writer(file, delimiter=',')
         writer.writerow(fields)
 
 
-def checkDOB(date_of_birth):
+def checkdob(date_of_birth):
     try:
 
         datetimeArray = date_of_birth.split(' ')[0].split('-')
 
-        validDateTime = True
+        valid_date_time = True
         if int(datetimeArray[0]) > 2100 or int(datetimeArray[0]) < 1900:
-            validDateTime = False
+            valid_date_time = False
         if int(datetimeArray[1]) > 12 or int(datetimeArray[1]) < 1:
-            validDateTime = False
+            valid_date_time = False
         if int(datetimeArray[2]) > 31 or int(datetimeArray[2]) < 1:
-            validDateTime = False
-        if not validDateTime:
+            valid_date_time = False
+        if not valid_date_time:
             print(
                 "Date of Birth is not given correctly, please input Date of birth correctly in the format of YYYY-MM-DD, otherwise Date of Birth is inputted incorrectly")
             return False
@@ -85,7 +79,7 @@ def checkDOB(date_of_birth):
     return True
 
 
-def checkID(clientID):
+def checkid(clientID):
     if clientID < 0:
         print("Input error, value cannot fall below 0, unlike my standards of you")
         return False
@@ -98,17 +92,17 @@ def checkID(clientID):
     return True
 
 
-def editClient(clientNo, columnNo, newText):
-    if not checkID(clientNo):
+def editclient(clientno, columnno, changedinput):
+    if not checkid(clientno):
         return
-    if columnNo == 6:
-        if not checkDOB(newText):
+    if columnno == 6:
+        if not checkdob(changedinput):
             return
-    if columnNo == 8 or columnNo == 9:
+    if columnno == 8 or columnno == 9:
         try:
-            isinstance(float(newText), float)
+            isinstance(float(changedinput), float)
         except:
-            print("Balance and Overdraft are not given as decimal values")
+            print("Balance and Overdraft are not given correctly")
             return
     with open(filename, 'r') as file:
         linesList = []
@@ -116,9 +110,9 @@ def editClient(clientNo, columnNo, newText):
         count = 0
         for line in lines:
             if count > 0:
-                if int(line[0]) == clientNo:
+                if int(line[0]) == clientno:
                     lineArray = line.split(',')
-                    lineArray[columnNo] = newText
+                    lineArray[columnno] = changedinput
                     text = ""
 
                     for g in lineArray:
@@ -130,8 +124,8 @@ def editClient(clientNo, columnNo, newText):
         file.writelines(linesList)
 
 
-def getClientValue(clientNo, columnNo):
-    if not checkID(clientNo):
+def getClient(clientNo, columnNo):
+    if not checkid(clientNo):
         return
     with open(filename, 'r') as file:
         lines = file.readlines()
@@ -145,7 +139,7 @@ def getClientValue(clientNo, columnNo):
 
 
 def deleteClient(clientNo):
-    if not checkID(clientNo):
+    if not checkid(clientNo):
         return
 
     with open(filename, 'r') as file:
@@ -171,24 +165,24 @@ def deleteClient(clientNo):
 
 
 def changeMoney(clientNo, change):
-    if not checkID(clientNo):
+    if not checkid(clientNo):
         return
 
-    currentMoney = getClientValue(clientNo, 8)
+    currentMoney = getClient(clientNo, 8)
     newMoney = float(currentMoney) + float(change)
     if checkOverdraft(clientNo, newMoney):
         newMoney = newMoney - 5
-    editClient(clientNo, 7, str(newMoney))
+    editclient(clientNo, 7, str(newMoney))
 
 
 def checkOverdraft(clientNo, newMoney):
-    currentoverdraft = float(getClientValue(clientNo, 8))
+    currentoverdraft = float(getClient(clientNo, 8))
     if newMoney < -abs(currentoverdraft):
         return True
 
 
-def searchByDOB(inputDOB):
-    if not checkDOB(inputDOB):
+def searchByDOB(inputDOB):     #allows the user to search with the correct date of birth format
+    if not checkdob(inputDOB):
         return
 
     datetimeArray = inputDOB.split('-')
@@ -196,7 +190,7 @@ def searchByDOB(inputDOB):
     viewConditional(6, str(DOB))
 
 
-def viewConditional(columnNo, searchTerm):
+def viewConditional(columnNo, searchTerm):    #defining this allows for the search by DOB
     with open(filename, 'r') as file:
         lines = file.readlines()
         count = 0
@@ -214,17 +208,4 @@ def viewConditional(columnNo, searchTerm):
 
                 count += 1
 
-
-def viewIndebtedClients():
-    with open(filename, 'r') as file:
-        lines = file.readlines()
-        count = 0
-        for line in lines:
-            if count == 0:
-                print(line)
-            if count > 0:
-                lineArray = line.split(',')
-                if float(lineArray[7]) < 0:
-                    print(line)
-            count += 1
 
